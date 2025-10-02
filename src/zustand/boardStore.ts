@@ -1,74 +1,179 @@
 import { CardType, ColumnType, KanbanActions, KanbanState } from "@/types/types"
 import { create } from "zustand"
+import { v4 as uuidv4 } from "uuid"
 
 const initialCards: Record<string, CardType> = {
-  "task-1": {
-    id: "task-1",
-    title: "Setup project repository",
-    description: "Initialize git, create main branch, add README.",
-    due: "Oct. 5th",
+  "card-1": {
+    id: "card-1",
+    title: "Design Landing Page",
+    due: "2025-10-15",
+    author: "Alex",
   },
-  "task-2": {
-    id: "task-2",
-    title: "Design the database schema",
-    description: "Define tables for users, tasks, and columns.",
-    due: "Oct. 5th",
+  "card-2": {
+    id: "card-2",
+    title: "Implement User Authentication",
+    due: "2025-10-20",
+    description: "Use OAuth 2.0 for Google and GitHub.",
   },
-  "task-3": {
-    id: "task-3",
-    title: "Develop the authentication API",
-    description: "Implement user login and registration endpoints.",
-    due: "Oct. 5th",
+  "card-3": { id: "card-3", title: "Setup CI/CD Pipeline", due: "2025-10-18" },
+  "card-4": {
+    id: "card-4",
+    title: "Write API Documentation",
+    due: "2025-11-01",
+    description: "Use Swagger/OpenAPI specification.",
   },
-  "task-4": {
-    id: "task-4",
-    title: "Create UI mockups",
-    description: "Use Figma to design the main board view.",
-    due: "Oct. 5th",
-  },
-  "task-5": {
-    id: "task-5",
-    title: "Deploy to staging server",
-    description: "Setup CI/CD pipeline.",
-    due: "Oct. 5th",
+  "card-5": {
+    id: "card-5",
+    title: "Final QA Testing",
+    due: "2025-10-28",
+    author: "Casey",
   },
 }
+
 const initialColumns: Record<string, ColumnType> = {
-  "column-1": {
-    id: "column-1",
-    categoryName: "To Do",
-    cardIds: ["task-1", "task-2", "task-4"],
-    color: "green",
+  "col-1": {
+    id: "col-1",
+    categoryName: "Backlog",
+    color: "#D838A8",
+    cardIds: ["card-1", "card-4"],
   },
-  "column-2": {
-    id: "column-2",
+  "col-2": {
+    id: "col-2",
     categoryName: "In Progress",
-    cardIds: ["task-3"],
-    color: "blue",
+    color: "#3498DB",
+    cardIds: ["card-2", "card-3"],
   },
-  "column-3": {
-    id: "column-3",
+  "col-3": {
+    id: "col-3",
     categoryName: "Done",
-    cardIds: ["task-5"],
-    color: "red",
+    color: "#2ECC71",
+    cardIds: ["card-5"],
   },
 }
 
-const initialColumnOrder: string[] = ["column-1", "column-2", "column-3"]
+const initialColumnOrder: string[] = ["col-1", "col-2", "col-3"]
 
-const useBoard = create<KanbanState & KanbanActions>((set, get) => ({
+export const useKanbanStore = create<KanbanState & KanbanActions>((set) => ({
   cards: initialCards,
   columns: initialColumns,
   columnOrder: initialColumnOrder,
-  addCard: (columnId, title, due, description) => {},
-  updateCard: (cardId, newTitle, newDue, newDescription) => {},
-  deleteCard: (cardId, columnId) => {},
+
+  setBoard: (board) => set(board),
+
+  addCard: (columnId, title, due, description) => {
+    const newCardId = `card-${uuidv4()}`
+    const newCard: CardType = { id: newCardId, title, due, description }
+
+    set((state) => ({
+      // updates the cards record to contain the new card with the id as the key
+      cards: {
+        ...state.cards,
+        [newCardId]: newCard,
+      },
+      // updates the column which the new card is supposed to go into by adding  the new card into the cardIds array
+      columns: {
+        ...state.columns,
+        [columnId]: {
+          ...state.columns[columnId],
+          cardIds: [...state.columns[columnId].cardIds, newCardId],
+        },
+      },
+    }))
+  },
+
+  updateCard: (cardId, newTitle, newDue, newDescription, newAuthor) => {
+    set((state) => {
+      // saves copy of the card which is being updated, indicated by id
+      const cardToUpdate = state.cards[cardId]
+      if (!cardToUpdate) return state
+
+      return {
+        cards: {
+          ...state.cards,
+          [cardId]: {
+            // Populates the card which is being updated with the data it already contains and then replaces anything that the user has provided as input
+            ...cardToUpdate,
+            title: newTitle ?? cardToUpdate.title,
+            due: newDue ?? cardToUpdate.due,
+            description: newDescription ?? cardToUpdate.description,
+            author: newAuthor ?? cardToUpdate.author,
+          },
+        },
+      }
+    })
+  },
+
+  deleteCard: (cardId, columnId) => {
+    set((state) => {
+      // Removes the card from the cards object
+      const newCards = { ...state.cards }
+      delete newCards[cardId]
+
+      // Removes the card id from the column which contained it
+      const newColumn = { ...state.columns[columnId] }
+      newColumn.cardIds = newColumn.cardIds.filter((id) => id !== cardId)
+
+      return {
+        cards: newCards,
+        columns: {
+          ...state.columns,
+          [columnId]: newColumn,
+        },
+      }
+    })
+  },
+
+  moveCardWithinColumn: (columnId, sourceIndex, destinationIndex) => {
+    set((state) => {
+      const column = state.columns[columnId]
+      const newCardIds = Array.from(column.cardIds)
+      const [movedCard] = newCardIds.splice(sourceIndex, 1)
+      newCardIds.splice(destinationIndex, 0, movedCard)
+
+      return {
+        columns: {
+          ...state.columns,
+          [columnId]: {
+            ...column,
+            cardIds: newCardIds,
+          },
+        },
+      }
+    })
+  },
+
   moveCardBetweenColumns: (
     sourceColumnId,
     destinationColumnId,
     sourceIndex,
     destinationIndex
-  ) => {},
-  moveCardWithinColumn: (columnId, sourceIndex, destinationIndex) => {},
-  setBoard: (board) => {},
+  ) => {
+    set((state) => {
+      // Return early if columns are the same; moveCardWithinColumn should be used instead
+      if (sourceColumnId === destinationColumnId) return state
+
+      const sourceColumn = state.columns[sourceColumnId]
+      const destColumn = state.columns[destinationColumnId]
+
+      const sourceCardIds = Array.from(sourceColumn.cardIds)
+      const destCardIds = Array.from(destColumn.cardIds)
+
+      const [movedCard] = sourceCardIds.splice(sourceIndex, 1)
+      destCardIds.splice(destinationIndex, 0, movedCard)
+
+      return {
+        columns: {
+          ...state.columns,
+          [sourceColumnId]: {
+            ...sourceColumn,
+            cardIds: sourceCardIds,
+          },
+          [destinationColumnId]: {
+            ...destColumn,
+            cardIds: destCardIds,
+          },
+        },
+      }
+    })
+  },
 }))

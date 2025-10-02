@@ -28,7 +28,8 @@ export interface KanbanActions {
     cardId: string,
     newTitle?: string,
     newDue?: string,
-    newDescription?: string
+    newDescription?: string,
+    newAuthor?: string
   ) => void
   deleteCard: (cardId: string, columnId: string) => void
   moveCardWithinColumn: (

@@ -7,8 +7,10 @@ import {
   AlertDialogOverlay,
   AlertDialogContent,
   AlertDialogTitle,
+  AlertDialogCancel,
 } from "./ui/alert-dialog"
 import AddColumnForm from "./AddColumnForm"
+import { X } from "lucide-react"
 
 const AddColumn = () => {
   const [open, setOpen] = useState(false)
@@ -25,7 +27,12 @@ const AddColumn = () => {
       <AlertDialogPortal>
         <AlertDialogOverlay />
         <AlertDialogContent>
-          <AlertDialogTitle>Add New Column</AlertDialogTitle>
+          <div className="flex justify-between items-center">
+            <AlertDialogTitle>Add New Column</AlertDialogTitle>
+            <AlertDialogCancel className="border-none">
+              <X />
+            </AlertDialogCancel>
+          </div>
           <AddColumnForm onClose={() => setOpen(false)} />
         </AlertDialogContent>
       </AlertDialogPortal>

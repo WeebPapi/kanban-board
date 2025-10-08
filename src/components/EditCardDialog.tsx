@@ -4,11 +4,13 @@ import { useKanbanStore } from "@/zustand/boardStore"
 import { Button } from "./ui/button"
 import {
   AlertDialog,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogPortal,
   AlertDialogTitle,
 } from "./ui/alert-dialog"
+import { X } from "lucide-react"
 
 interface EditCardDialogProps {
   open: boolean
@@ -48,7 +50,12 @@ const EditCardDialog: React.FC<EditCardDialogProps> = ({
       <AlertDialogPortal>
         <AlertDialogOverlay />
         <AlertDialogContent>
-          <AlertDialogTitle>Edit Task</AlertDialogTitle>
+          <div className="flex justify-between items-center">
+            <AlertDialogTitle>Edit Task</AlertDialogTitle>
+            <AlertDialogCancel className="border-none">
+              <X />
+            </AlertDialogCancel>
+          </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-2">
             <label className="font-semibold">Title</label>
             <input

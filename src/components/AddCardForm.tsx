@@ -119,10 +119,13 @@ const AddCardForm: React.FC<Props> = ({ colId }) => {
               )}
             />{" "}
             <div>
-              <AlertDialogCancel className="border-green-800 text-green-800">
+              <AlertDialogCancel className="border-green-800 text-green-800 mr-4 bg-gray-100">
                 Cancel
               </AlertDialogCancel>
-              <Button type="submit" className="border-green-800 text-green-800">
+              <Button
+                type="submit"
+                className="border-green-800 text-green-800 bg-gray-100"
+              >
                 Continue
               </Button>
             </div>

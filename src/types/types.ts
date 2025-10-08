@@ -44,4 +44,5 @@ export interface KanbanActions {
     destinationIndex: number
   ) => void
   setBoard: (board: KanbanState) => void
+  addColumn: (categoryName: string, color: string) => void
 }

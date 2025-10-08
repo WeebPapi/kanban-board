@@ -6,26 +6,26 @@ const initialCards: Record<string, CardType> = {
   "card-1": {
     id: "card-1",
     title: "Design Landing Page",
-    due: "2025-10-15",
+    due: "Oct 15th",
     author: "Alex",
   },
   "card-2": {
     id: "card-2",
     title: "Implement User Authentication",
-    due: "2025-10-20",
+    due: "Oct 20th",
     description: "Use OAuth 2.0 for Google and GitHub.",
   },
-  "card-3": { id: "card-3", title: "Setup CI/CD Pipeline", due: "2025-10-18" },
+  "card-3": { id: "card-3", title: "Setup CI/CD Pipeline", due: "Oct 18th" },
   "card-4": {
     id: "card-4",
     title: "Write API Documentation",
-    due: "2025-11-01",
+    due: "Nov 1st",
     description: "Use Swagger/OpenAPI specification.",
   },
   "card-5": {
     id: "card-5",
     title: "Final QA Testing",
-    due: "2025-10-28",
+    due: "Oct 28th",
     author: "Casey",
   },
 }
@@ -54,6 +54,22 @@ const initialColumns: Record<string, ColumnType> = {
 const initialColumnOrder: string[] = ["col-1", "col-2", "col-3"]
 
 export const useKanbanStore = create<KanbanState & KanbanActions>((set) => ({
+  addColumn: (categoryName: string, color: string) => {
+    const newColId = `col-${uuidv4()}`
+    const newColumn: ColumnType = {
+      id: newColId,
+      categoryName,
+      color,
+      cardIds: [],
+    }
+    set((state) => ({
+      columns: {
+        ...state.columns,
+        [newColId]: newColumn,
+      },
+      columnOrder: [...state.columnOrder, newColId],
+    }))
+  },
   cards: initialCards,
   columns: initialColumns,
   columnOrder: initialColumnOrder,

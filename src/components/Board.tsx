@@ -5,6 +5,7 @@ import Column from "./Column"
 import TaskCard from "./TaskCard"
 import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core"
 import { rectIntersection, pointerWithin } from "@dnd-kit/core"
+import AddColumn from "./AddColumn"
 
 const Board = () => {
   const store = useKanbanStore()
@@ -79,7 +80,7 @@ const Board = () => {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="w-full flex justify-between ">
+      <div className="w-[90%] grid grid-cols-3 gap-1 min-h-[442px] relative">
         {columnOrder.map((colId) => (
           <Column
             key={colId}
@@ -89,6 +90,7 @@ const Board = () => {
             color={columns[colId].color}
           />
         ))}
+        <AddColumn />
       </div>
       <DragOverlay>
         {activeId ? (

@@ -17,7 +17,7 @@ const Column: React.FC<ColumnProps> = ({
 }) => {
   const { setNodeRef } = useDroppable({ id })
   return (
-    <div ref={setNodeRef} className="h-full">
+    <div ref={setNodeRef} className="h-full mb-8">
       <SortableContext strategy={verticalListSortingStrategy} items={cardIds}>
         <Card className={` w-[400px] pt-0 `}>
           <CardHeader style={{ backgroundColor: color }} className="py-4">
